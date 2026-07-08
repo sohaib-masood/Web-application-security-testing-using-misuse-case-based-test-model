@@ -8,6 +8,7 @@ This repository contains the NLP implementation and soruce code files.
 - `keyword_detection.py` — Keyword detection
 - `pos_tagging.py` — Part-of-Speech tagging
 - `pattern_labeling.py` — Pattern-based labeling of sentences
+- `Algorithms` — algorithm for Test model graph , test sequences and OCL constratins generation
 
 ## Tools Used
 
