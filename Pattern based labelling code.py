@@ -12,117 +12,191 @@ precondition_statements = set()
 postcondition_statements = set()
 
 # Keywords for each pattern
-input_keywords = {"inputs", "enters", "provides", "requests",
-                  "input", "submits", "selects"}
-output_keywords = {"displays", "sends", "response", "executes",
-                   "exploits", "logs", "modifies", "writes",
-                   "updates", "deletes", "rejects", "fails",
-                   "validates", "detects"}
-condition_keywords = {"IF", "THEN", "if", "then"}
+input_keywords = {
+    "enter", "provide", "request", "input",
+    "submit", "select", "modify"
+}
 
-system_entities = {"SYSTEM", "MALICIOUS_USER", "DATABASE", "APPLICATION"}
+output_keywords = {
+    "display", "send", "response", "execute",
+    "exploit", "log", "write", "update",
+    "delete", "reject", "fail",
+    "validate", "detect",
+    "grant", "deny", "generate", "process"
+}
 
-# Prefixes to skip entirely
-skip_prefixes = {"btf", "satf", "saf", "rfs", "endfor", "endif",
-                 "resume", "foreach", "for", "end", "description",
-                 "primary", "misuse", "actor", "basic", "specific"}
+system_entities = {
+    "SYSTEM",
+    "MALICIOUS_USER",
+    "DATABASE",
+    "APPLICATION"
+}
 
-# Remove flow labels like "BTF 1.", "SATF A.1", "SAF B.1." from start of line
+skip_prefixes = {
+    "btf", "satf", "saf", "rfs",
+    "endfor", "endif",
+    "resume", "foreach",
+    "for", "end",
+    "description",
+    "primary",
+    "misuse",
+    "actor",
+    "basic",
+    "specific"
+}
+
+# ---------------------------------------------------
+# Remove flow labels
+# ---------------------------------------------------
 def remove_flow_label(text):
-    # Removes patterns like BTF 1. or SATF A.1. or SAF B.1. from beginning
-    cleaned = re.sub(r'^(SATF\s+\w+\.\d*\.?|SAF\s+\w+\.\d*\.?|BTF\s+\d+\.?)\s*', 
-                     '', text, flags=re.IGNORECASE)
+    cleaned = re.sub(
+        r'^(SATF\s+\w+\.\d*\.?|SAF\s+\w+\.\d*\.?|BTF\s+\d+\.?)\s*',
+        '',
+        text,
+        flags=re.IGNORECASE
+    )
     return cleaned.strip()
 
-# Split data into lines and process
+# ---------------------------------------------------
+# Clean lines
+# ---------------------------------------------------
 lines = data.split("\n")
+
 cleaned_lines = []
+
 for line in lines:
+
     line = line.strip()
+
     if not line:
         continue
+
     cleaned_lines.append(remove_flow_label(line))
 
-# Now classify each cleaned line
+# ---------------------------------------------------
+# Pattern Based Labeling
+# ---------------------------------------------------
+
+current_section = None
+
 for line in cleaned_lines:
+
     if not line:
         continue
 
-    # Get first word for prefix check
     first_word = line.split()[0].lower().rstrip(":")
 
-    # --------------------------------------------------------
-    # Precondition
-    # --------------------------------------------------------
+    # -------------------------
+    # Precondition Section
+    # -------------------------
     if first_word == "precondition":
+        current_section = "precondition"
         precondition_statements.add(line)
         continue
 
-    # --------------------------------------------------------
+    # Continue collecting precondition until next section
+    if current_section == "precondition":
+
+        if (
+            line.startswith("Basic Threat Flow")
+            or line.startswith("Specific Alternative")
+            or line.startswith("Postcondition")
+        ):
+            current_section = None
+        else:
+            precondition_statements.add(line)
+            continue
+
+    # -------------------------
     # Postcondition
-    # --------------------------------------------------------
+    # -------------------------
     if first_word == "postcondition":
         postcondition_statements.add(line)
         continue
 
-    # --------------------------------------------------------
-    # Skip irrelevant lines
-    # --------------------------------------------------------
+    # -------------------------
+    # Skip headers
+    # -------------------------
     if first_word in skip_prefixes:
         continue
 
-    # Skip header/description lines
-    if any(skip in line for skip in ["Misuse Case:", "Primary Actor:",
-                                      "Description:", "Basic Threat",
-                                      "Specific Alternative", "RFS"]):
+    if any(skip in line for skip in [
+        "Misuse Case:",
+        "Primary Actor:",
+        "Description:",
+        "Basic Threat",
+        "Specific Alternative",
+        "RFS"
+    ]):
         continue
 
-    # --------------------------------------------------------
-    # Conditional Sentences (IF...THEN)
-    # --------------------------------------------------------
-    if re.search(r'\bIF\b|\bIf\b', line) and re.search(r'\bTHEN\b|\bThen\b', line):
+    # -------------------------
+    # Conditions
+    # -------------------------
+    if re.search(r"\bIF\b|\bIf\b", line) and re.search(r"\bTHEN\b|\bThen\b", line):
         condition_statements.add(line)
         continue
 
-    # --------------------------------------------------------
-    # Process remaining lines with spaCy
-    # --------------------------------------------------------
+    # -------------------------
+    # spaCy processing
+    # -------------------------
     sent_doc = nlp(line)
-    contains_system_entity = any(entity in line.upper() 
-                                  for entity in system_entities)
-    contains_output_action = any(token.lemma_ in output_keywords 
-                                  for token in sent_doc)
-    contains_input_action = any(token.lemma_ in input_keywords 
-                                 for token in sent_doc)
 
-    # Output Statement
-    if contains_system_entity and contains_output_action and \
-       "SYSTEM" in line.upper():
+    contains_system_entity = any(
+        entity in line.upper()
+        for entity in system_entities
+    )
+
+    contains_output_action = any(
+        token.lemma_.lower() in output_keywords
+        for token in sent_doc
+    )
+
+    contains_input_action = any(
+        token.lemma_.lower() in input_keywords
+        for token in sent_doc
+    )
+
+    # -------------------------
+    # Output Statements
+    # -------------------------
+    if (
+        "SYSTEM" in line.upper()
+        and contains_output_action
+    ):
         output_statements.add(line)
 
-    # Input Statement
-    elif contains_input_action and "MALICIOUS_USER" in line.upper():
+    # -------------------------
+    # Input Statements
+    # -------------------------
+    elif (
+        "MALICIOUS_USER" in line.upper()
+        and contains_input_action
+    ):
         input_statements.add(line)
 
+# ---------------------------------------------------
+# Display Results
+# ---------------------------------------------------
 
 print("\nPattern Based Labeling:")
 
 print("\nPrecondition Statements:")
-for s in list(precondition_statements):
+for s in sorted(precondition_statements):
     print(" →", s)
 
 print("\nPostcondition Statements:")
-for s in list(postcondition_statements):
+for s in sorted(postcondition_statements):
     print(" →", s)
 
 print("\nInput Statements:")
-for s in list(input_statements):
+for s in sorted(input_statements):
     print(" →", s)
 
 print("\nOutput Statements:")
-for s in list(output_statements):
+for s in sorted(output_statements):
     print(" →", s)
 
 print("\nCondition Statements:")
-for s in list(condition_statements):
+for s in sorted(condition_statements):
     print(" →", s)
