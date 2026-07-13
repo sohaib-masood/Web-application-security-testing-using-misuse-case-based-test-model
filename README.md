@@ -14,7 +14,7 @@ This repository contains the source code and Natural Language Processing (NLP) i
 
 ## Dataset Information
 
-This study does not use a machine learning training dataset. The proposed framework processes misuse case specifications using Natural Language Processing (NLP) techniques. The misuse case specifications processed using NLP are already presented in Manuscript.
+This study does not use a machine learning training dataset. The proposed framework processes misuse case specifications using Natural Language Processing (NLP) techniques. The misuse case specifications are presented in the manuscript and serve as the input to the proposed framework.
 
 ## Code Information
 
