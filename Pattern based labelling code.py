@@ -22,7 +22,7 @@ output_keywords = {
     "exploit", "log", "write", "update",
     "delete", "reject", "fail",
     "validate", "detect",
-    "grant", "deny", "generate", "process"
+    "grant", "deny", "generate", "process" "authenticate"
 }
 
 system_entities = {
