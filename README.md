@@ -4,6 +4,7 @@ This repository contains the source code and Natural Language Processing (NLP) i
 
 ## Contents
 
+- `Raw Data for Web Application Security Testing.xlsx` – Curated raw data containing the misuse case specifications used in this study.
 - `tokenization.py` – Performs tokenization of misuse case specifications.
 - `Keywords matcher.py` – Identifies security-related keywords from misuse case descriptions.
 - `POS tagging.py` – Performs Part-of-Speech (POS) tagging using spaCy.
@@ -14,7 +15,10 @@ This repository contains the source code and Natural Language Processing (NLP) i
 
 ## Dataset Information
 
-This study does not use a machine learning training dataset. The proposed framework processes misuse case specifications using Natural Language Processing (NLP) techniques. The misuse case specifications are presented in the manuscript and serve as the input to the proposed framework.
+This repository includes the curated raw data used in the study. The file **Raw Data for Web Application Security Testing.xlsx** contains two misuse case specifications:
+- **Bypass Authorization** – A hypothetical misuse case used to illustrate the proposed methodology.
+- **Injection Attack** – The misuse case used for the case study and evaluation presented in the manuscript.
+These misuse case specifications serve as the input to the proposed NLP-based framework.
 
 ## Code Information
 
@@ -37,16 +41,17 @@ python -m spacy download en_core_web_sm
 
 ## Usage Instructions
 
-1. Install Python and spaCy.
-2. Download the English language model for spaCy.
-3. Execute the Python scripts in the following order:
+1. Download the repository.
+2. Open **Raw Data for Web Application Security Testing.xlsx** and select a misuse case specification.
+3. Copy the selected misuse case specification into the `data` variable in the Python scripts.
+4. Install Python and spaCy.
+5. Download the English language model for spaCy.
+6. Execute the Python scripts in the following order:
    - `tokenization.py`
    - `Keywords matcher.py`
    - `POS tagging.py`
    - `Pattern based labelling code.py`
-4. Review the extracted information.
-5. Use the generated information to construct Object Constraint Language (OCL) constraints and security test cases as described in the paper.
-
+7. Review the extracted information and use it as described in the manuscript.
 ---
 
 ## Methodology
@@ -66,9 +71,9 @@ The proposed framework consists of the following steps:
 
 ## Citation
 
-This repository accompanies the manuscript "Web Application Security Testing Using Misuse Case Based Test Model." Please cite the published article if you use this repository after publication.
+This repository accompanies the manuscript entitled *Web Application Security Testing Using Misuse Case Based Test Model*. If you use the source code or raw dataset provided in this repository for academic or research purposes, please cite the corresponding published article.
 
 ---
-
 ## License
+
 This repository is provided for academic and research purposes only.
