@@ -8,9 +8,9 @@ This repository contains the source code and Natural Language Processing (NLP) i
 - `Keywords matcher.py` – Identifies security-related keywords from misuse case descriptions.
 - `POS tagging.py` – Performs Part-of-Speech (POS) tagging using spaCy.
 - `Pattern based labelling code.py` – Labels extracted information using predefined linguistic patterns.
-- `Algorithms described in manuscript.docx` – Algorithms presented in the research paper.
-- `Case Study 1 login page source code.docx` – Source code used in the first case study.
-- `Case Study 2 user model source code.docx` – Source code used in the second case study.
+- `Algorithms described in manuscript.md` – Algorithms presented in the research paper.
+- `Case Study 1 login page source code.php` – Source code used in the first case study.
+- `Case Study 2 user model source code.php` – Source code used in the second case study.
 
 ## Dataset Information
 
